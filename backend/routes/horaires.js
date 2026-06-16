@@ -2,14 +2,8 @@ const express = require('express');
 const router = express.Router();
 const horaireModel = require('../models/horaireModel');
 
-function getEntrepriseId(req, res, next) {
-    const entrepriseId = req.headers['x-entreprise-id'];
-    if (!entrepriseId) return res.status(400).json({ error: 'Header x-entreprise-id requis' });
-    req.entrepriseId = parseInt(entrepriseId);
-    next();
-}
-
-router.use(getEntrepriseId);
+const authMiddleware = require('../middleware/auth');
+router.use(authMiddleware);
 
 // GET /api/horaires - liste les horaires d'ouverture
 router.get('/', async (req, res) => {

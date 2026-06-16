@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const entrepriseModel = require('../models/entrepriseModel');
+const authMiddleware = require('../middleware/auth');
 
 // GET /api/entreprises - liste (debug, à restreindre avec l'auth plus tard)
 router.get('/', async (req, res) => {
@@ -45,7 +46,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/entreprises/:id
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const { nom, telephone, secteur, delai_rappel_heures } = req.body;
         await entrepriseModel.updateEntreprise(req.params.id, nom, telephone, secteur, delai_rappel_heures);

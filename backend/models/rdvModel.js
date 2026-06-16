@@ -86,7 +86,8 @@ async function getRdvAvantRappel() {
         JOIN entreprises e ON rv.entreprise_id = e.id
         WHERE rv.statut = 'confirme'
           AND rv.rappel_envoye = FALSE
-          AND rv.date_heure BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL e.delai_rappel_heures HOUR)
+          AND DATE_SUB(rv.date_heure, INTERVAL e.delai_rappel_heures HOUR) <= NOW()
+          AND rv.date_heure > NOW()
     `);
     return rows;
 }

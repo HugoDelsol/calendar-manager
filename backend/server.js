@@ -7,6 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Route publique (pas de JWT requis)
+app.use('/api/auth', require('./routes/auth'));
+
+// Routes protégées (JWT requis via authMiddleware dans chaque router)
 app.use('/api/entreprises', require('./routes/entreprises'));
 app.use('/api/services', require('./routes/services'));
 app.use('/api/clients', require('./routes/clients'));
@@ -21,19 +25,3 @@ démarrerReminderJob();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
-
-const emailService = require('./services/emailService');
-
-app.get('/api/test-email', async (req, res) => {
-    try {
-        await emailService.envoyerRappelEmail(
-            'hugo.delsol64@gmail.com',       // ton vrai email pour tester
-            'Jean Test',
-            'Coupe femme',
-            new Date(Date.now() + 24 * 60 * 60 * 1000)  // demain
-        );
-        res.json({ message: 'Email envoyé' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});

@@ -2,14 +2,8 @@ const express = require('express');
 const router = express.Router();
 const clientModel = require('../models/clientModel');
 
-function getEntrepriseId(req, res, next) {
-    const entrepriseId = req.headers['x-entreprise-id'];
-    if (!entrepriseId) return res.status(400).json({ error: 'Header x-entreprise-id requis' });
-    req.entrepriseId = parseInt(entrepriseId);
-    next();
-}
-
-router.use(getEntrepriseId);
+const authMiddleware = require('../middleware/auth');
+router.use(authMiddleware);
 
 router.get('/', async (req, res) => {
     try {

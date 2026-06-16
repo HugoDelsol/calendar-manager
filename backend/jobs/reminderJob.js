@@ -3,6 +3,7 @@ const rdvModel = require('../models/rdvModel');
 const emailService = require('../services/emailService');
 
 function démarrerReminderJob() {
+    
     cron.schedule('*/15 * * * *', async () => {
         console.log('Vérification des rappels à envoyer...');
 
