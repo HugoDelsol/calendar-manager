@@ -26,9 +26,9 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { nom, telephone, email } = req.body;
+        const { nom, telephone, email, informations } = req.body;
         if (!nom || !telephone) return res.status(400).json({ error: 'nom et telephone sont requis' });
-        const id = await clientModel.createClient(req.entrepriseId, nom, telephone, email);
+        const id = await clientModel.createClient(req.entrepriseId, nom, telephone, email, informations);
         res.status(201).json({ id, nom, telephone, email });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -37,8 +37,8 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     try {
-        const { nom, telephone, email } = req.body;
-        await clientModel.updateClient(req.params.id, req.entrepriseId, nom, telephone, email);
+        const { nom, telephone, email, informations } = req.body;
+        await clientModel.updateClient(req.params.id, req.entrepriseId, nom, telephone, email, informations);
         res.json({ message: 'Client mis à jour' });
     } catch (err) {
         res.status(500).json({ error: err.message });

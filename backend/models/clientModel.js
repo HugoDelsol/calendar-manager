@@ -10,18 +10,18 @@ async function getClientById(id, entreprise_id) {
     return rows[0];
 }
 
-async function createClient(entreprise_id, nom, telephone, email) {
+async function createClient(entreprise_id, nom, telephone, email, informations) {
     const [result] = await pool.query(
-        'INSERT INTO clients (entreprise_id, nom, telephone, email) VALUES (?, ?, ?, ?)',
-        [entreprise_id, nom, telephone, email]
+        'INSERT INTO clients (entreprise_id, nom, telephone, email, informations) VALUES (?, ?, ?, ?, ?)',
+        [entreprise_id, nom, telephone, email, informations]
     );
     return result.insertId;
 }
 
-async function updateClient(id, entreprise_id, nom, telephone, email) {
+async function updateClient(id, entreprise_id, nom, telephone, email, informations) {
     await pool.query(
-        'UPDATE clients SET nom = ?, telephone = ?, email = ? WHERE id = ? AND entreprise_id = ?',
-        [nom, telephone, email, id, entreprise_id]
+        'UPDATE clients SET nom = ?, telephone = ?, email = ?, informations = ? WHERE id = ? AND entreprise_id = ?',
+        [nom, telephone, email, informations, id, entreprise_id]
     );
 }
 
