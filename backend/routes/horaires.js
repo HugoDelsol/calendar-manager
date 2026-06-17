@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const horaireModel = require('../models/horaireModel');
+const { reglesHoraire, valider } = require('../middleware/sanitize');
 
 const authMiddleware = require('../middleware/auth');
 router.use(authMiddleware);
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/horaires - ajoute une plage horaire
-router.post('/', async (req, res) => {
+router.post('/', reglesHoraire, valider, async (req, res) => {
     try {
         const { jour_semaine, heure_debut, heure_fin } = req.body;
         if (jour_semaine === undefined || !heure_debut || !heure_fin) {

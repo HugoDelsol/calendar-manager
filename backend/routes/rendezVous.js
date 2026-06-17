@@ -4,6 +4,7 @@ const rdvModel = require('../models/rdvModel');
 const serviceModel = require('../models/serviceModel');
 const horaireModel = require('../models/horaireModel');
 const fermetureModel = require('../models/fermetureModel');
+const { reglesRdv, valider } = require('../middleware/sanitize');
 
 const authMiddleware = require('../middleware/auth');
 router.use(authMiddleware);
@@ -27,7 +28,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', reglesRdv, valider, async (req, res) => {
     try {
         const { client_id, service_id, date_heure } = req.body;
         if (!client_id || !service_id || !date_heure) {
@@ -61,7 +62,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', reglesRdv, valider, async (req, res) => {
     try {
         const { date_heure, statut } = req.body;
         if (!date_heure || !statut) return res.status(400).json({ error: 'date_heure et statut sont requis' });

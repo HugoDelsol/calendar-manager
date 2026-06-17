@@ -8,7 +8,7 @@ export default function Clients() {
     const [clientEnEdition, setClientEnEdition] = useState(null);
     const [recherche, setRecherche] = useState('');
     const [erreur, setErreur] = useState('');
-    const [form, setForm] = useState({ nom: '', telephone: '', email: '', informations: '' });
+    const [form, setForm] = useState({ nom: '', telephone: '', email: '', informations: '', adresse: '' });
 
     useEffect(() => {
         chargerClients();
@@ -32,7 +32,8 @@ export default function Clients() {
                 nom: client.nom,
                 telephone: client.telephone,
                 email: client.email || '',
-                informations: client.informations || ''
+                informations: client.informations || '',
+                adresse: client.adresse || '',
             });
         } else {
             setClientEnEdition(null);
@@ -142,7 +143,7 @@ export default function Clients() {
                             </div>
 
                             <div style={styles.champ}>
-                                <label style={styles.label}>Email (optionnel)</label>
+                                <label style={styles.label}>Email</label>
                                 <input
                                     type="email"
                                     name="email"
@@ -150,6 +151,18 @@ export default function Clients() {
                                     onChange={handleChange}
                                     style={styles.input}
                                     placeholder="marie@example.com"
+                                />
+                            </div>
+
+                            <div style={styles.champ}>
+                                <label style={styles.label}>Adresse (optionnel)</label>
+                                <input
+                                    type="text"
+                                    name="adresse"
+                                    value={form.adresse}
+                                    onChange={handleChange}
+                                    style={styles.input}
+                                    placeholder="12 rue de la Paix, 75001 Paris"
                                 />
                             </div>
 
@@ -198,7 +211,10 @@ export default function Clients() {
                     </div>
                     {clientsFiltres.map(client => (
                         <div key={client.id} style={styles.ligneClient}>
-                            <span style={styles.clientNom}>{client.nom}</span>
+                            <div>
+                                <span style={styles.clientNom}>{client.nom}</span>
+                                {client.adresse && <span style={styles.clientAdresse}>{client.adresse}</span>}
+                            </div>
                             <span style={styles.clientInfo}>{client.telephone}</span>
                             <span style={styles.clientInfo}>{client.email || '—'}</span>
                             <span style={styles.clientInfo}>{client.informations || '—'}</span>
@@ -227,8 +243,8 @@ export default function Clients() {
 }
 
 const styles = {
-    container: {        
-        width: '90vw',
+    container: {
+        width: '60vw',
         margin: '0 auto',
         padding: '32px 24px'
     },
@@ -246,8 +262,8 @@ const styles = {
     },
     titre: {
         fontSize: '28px',
-        color: '#333',
-        margin: 0
+        color: '#f0f0f0',
+        margin: '0'
     },
     boutonAjouter: {
         backgroundColor: '#6366f1',
@@ -309,6 +325,11 @@ const styles = {
         fontWeight: '600',
         color: '#333',
         fontSize: '15px'
+    },
+    clientAdresse: {
+        display: 'block',
+        color: '#aaa',
+        fontSize: '12px'
     },
     clientInfo: {
         color: '#666',

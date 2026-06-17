@@ -116,7 +116,7 @@ export default function Dashboard() {
             <div style={styles.section}>
                 <h2 style={styles.sectionTitre}>Accès rapide</h2>
                 <div style={styles.raccourcis}>
-                    <Link to="/rendez-vous" style={styles.raccourci}>
+                    <Link to={`/booking/${entreprise?.id}`} style={styles.raccourci}>
                         <span style={styles.raccourciIcon}>📅</span>
                         <span>Nouveau RDV</span>
                     </Link>
@@ -139,8 +139,8 @@ export default function Dashboard() {
 }
 
 const styles = {
-    container: {        
-        width: '90vw',
+    container: {
+        width: '60vw',
         margin: '0 auto',
         padding: '32px 24px'
     },
@@ -152,8 +152,8 @@ const styles = {
     },
     titre: {
         fontSize: '28px',
-        color: '#333',
-        margin: '0 0 4px 0'
+        color: '#f0f0f0',
+        margin: '10px 0'
     },
     date: {
         color: '#888',

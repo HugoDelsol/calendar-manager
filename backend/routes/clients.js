@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const clientModel = require('../models/clientModel');
+const { reglesClient, valider } = require('../middleware/sanitize');
 
 const authMiddleware = require('../middleware/auth');
 router.use(authMiddleware);
@@ -24,21 +25,21 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', reglesClient, valider, async (req, res) => {
     try {
-        const { nom, telephone, email, informations } = req.body;
+        const { nom, telephone, email, informations, adresse } = req.body;
         if (!nom || !telephone) return res.status(400).json({ error: 'nom et telephone sont requis' });
-        const id = await clientModel.createClient(req.entrepriseId, nom, telephone, email, informations);
+        const id = await clientModel.createClient(req.entrepriseId, nom, telephone, email, informations, adresse);
         res.status(201).json({ id, nom, telephone, email });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', reglesClient, valider, async (req, res) => {
     try {
-        const { nom, telephone, email, informations } = req.body;
-        await clientModel.updateClient(req.params.id, req.entrepriseId, nom, telephone, email, informations);
+        const { nom, telephone, email, informations, adresse } = req.body;
+        await clientModel.updateClient(req.params.id, req.entrepriseId, nom, telephone, email, informations, adresse);
         res.json({ message: 'Client mis à jour' });
     } catch (err) {
         res.status(500).json({ error: err.message });

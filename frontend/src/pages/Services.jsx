@@ -214,7 +214,7 @@ export default function Services() {
 
 const styles = {
     container: {
-        width: '90vw',
+        width: '60vw',
         margin: '0 auto',
         padding: '32px 24px'
     },
@@ -232,8 +232,8 @@ const styles = {
     },
     titre: {
         fontSize: '28px',
-        color: '#333',
-        margin: 0
+        color: '#f0f0f0',
+        margin: '0'
     },
     boutonAjouter: {
         backgroundColor: '#6366f1',

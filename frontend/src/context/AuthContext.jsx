@@ -6,7 +6,7 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(localStorage.getItem('token') || null);
     const [entreprise, setEntreprise] = useState(
         JSON.parse(localStorage.getItem('entreprise')) || null
-    );
+    );    
 
     function login(token, entreprise) {
         localStorage.setItem('token', token);

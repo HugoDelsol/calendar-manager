@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const serviceModel = require('../models/serviceModel');
+const { reglesService, valider } = require('../middleware/sanitize');
 
 const authMiddleware = require('../middleware/auth');
 router.use(authMiddleware);
+
 
 router.get('/', async (req, res) => {
     try {
@@ -26,7 +28,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', reglesService, valider, async (req, res) => {
     try {
         const { nom, duree_minutes, prix, description } = req.body;
 
@@ -41,7 +43,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', reglesService, valider, async (req, res) => {
     try {
         const { nom, duree_minutes, prix, description } = req.body;
         await serviceModel.updateService(req.params.id, req.entrepriseId, nom, duree_minutes, prix, description);

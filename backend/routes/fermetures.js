@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fermetureModel = require('../models/fermetureModel');
+const { reglesFermeture, valider } = require('../middleware/sanitize');
 
 const authMiddleware = require('../middleware/auth');
 router.use(authMiddleware);
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/fermetures
-router.post('/', async (req, res) => {
+router.post('/', reglesFermeture, valider, async (req, res) => {
     try {
         const { date_debut, date_fin, motif } = req.body;
         if (!date_debut || !date_fin) return res.status(400).json({ error: 'date_debut et date_fin sont requis' });

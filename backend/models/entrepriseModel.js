@@ -35,10 +35,15 @@ async function updateEntreprise(id, nom, telephone, secteur, delai_rappel_heures
     );
 }
 
+async function updateMotDePasse(id, hash) {
+    await pool.query('UPDATE entreprises SET mot_de_passe = ? WHERE id = ?', [hash, id]);
+}
+
 module.exports = {
     getAllEntreprises,
     getEntrepriseById,
     getEntrepriseByEmail,
     createEntreprise,
-    updateEntreprise
+    updateEntreprise,
+    updateMotDePasse
 };

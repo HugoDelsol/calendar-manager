@@ -54,4 +54,40 @@ async function envoyerRappelEmail(email, clientNom, serviceNom, dateHeure) {
     }
 }
 
-module.exports = { envoyerRappelEmail };
+async function envoyerConfirmation(email, clientNom, serviceNom, dateHeure, entrepriseNom) {
+    const date = new Date(dateHeure);
+    const dateFormatee = date.toLocaleString('fr-FR', {
+        weekday: 'long', day: 'numeric', month: 'long',
+        hour: '2-digit', minute: '2-digit'
+    });
+
+    await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'api-key': process.env.BREVO_API_KEY
+        },
+        body: JSON.stringify({
+            sender: { name: entrepriseNom, email: process.env.BREVO_SENDER_EMAIL },
+            to: [{ email }],
+            subject: `Confirmation de votre rendez-vous - ${entrepriseNom}`,
+            htmlContent: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #6366f1;">Rendez-vous confirmé ✅</h2>
+                    <p>Bonjour <strong>${clientNom}</strong>,</p>
+                    <p>Votre rendez-vous a bien été enregistré :</p>
+                    <div style="background: #f8f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #6366f1;">
+                        <p><strong>📍 Établissement :</strong> ${entrepriseNom}</p>
+                        <p><strong>✂️ Service :</strong> ${serviceNom}</p>
+                        <p><strong>📅 Date :</strong> ${dateFormatee}</p>
+                    </div>
+                    <p>Un rappel vous sera envoyé automatiquement avant votre rendez-vous.</p>
+                    <p>À bientôt !</p>
+                    <p style="color: #888; font-size: 12px;">— ${entrepriseNom}</p>
+                </div>
+            `
+        })
+    });
+}
+
+module.exports = { envoyerRappelEmail, envoyerConfirmation };

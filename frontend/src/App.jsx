@@ -10,6 +10,7 @@ import RendezVous from './pages/RendezVous';
 import Horaires from './pages/Horaires';
 import Parametres from './pages/Parametres';
 import { useAuth } from './context/AuthContext';
+import Booking from './pages/Booking';
 
 export default function App() {
     const { token } = useAuth();
@@ -21,6 +22,7 @@ export default function App() {
                 {/* Routes publiques */}
                 <Route path="/login" element={!token ? <Login /> : <Navigate to="/" replace />} />
                 <Route path="/inscription" element={!token ? <Inscription /> : <Navigate to="/" replace />} />
+                <Route path="/booking/:entrepriseId" element={<Booking />} />
 
                 {/* Routes protégées */}
                 <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

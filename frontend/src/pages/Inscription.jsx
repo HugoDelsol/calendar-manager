@@ -38,6 +38,19 @@ export default function Inscription() {
         }
     }
 
+    function evaluerForce(mdp) {
+        let force = 0;
+        if (mdp.length >= 8) force++;
+        if (/[A-Z]/.test(mdp)) force++;
+        if (/[a-z]/.test(mdp)) force++;
+        if (/[0-9]/.test(mdp)) force++;
+        if (/[@$!%*?&_\-#]/.test(mdp)) force++;
+        return force;
+    }
+
+    const force = evaluerForce(form.mot_de_passe);
+    const forceCouleurs = ['#ddd', '#dc2626', '#f97316', '#eab308', '#16a34a', '#15803d'];
+
     return (
         <div style={styles.container}>
             <div style={styles.card}>
@@ -84,6 +97,18 @@ export default function Inscription() {
                             placeholder="••••••••"
                             required
                         />
+                        {form.mot_de_passe && (
+                            <>
+                                <div style={styles.barreForceContainer}>
+                                    {[1, 2, 3, 4, 5].map(i => (
+                                        <div key={i} style={{
+                                            ...styles.barreForceSegment,
+                                            backgroundColor: i <= force ? forceCouleurs[force] : '#ddd'
+                                        }} />
+                                    ))}
+                                </div>                              
+                            </>
+                        )}
                     </div>
 
                     <div style={styles.champ}>
@@ -151,7 +176,6 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f5f5f5',
     },
     card: {
         backgroundColor: 'white',
@@ -217,5 +241,16 @@ const styles = {
         marginTop: '20px',
         fontSize: '14px',
         color: '#888'
+    }, 
+    barreForceContainer: {
+        display: 'flex',
+        gap: '4px',
+        marginTop: '6px'
+    },
+    barreForceSegment: {
+        height: '4px',
+        flex: 1,
+        borderRadius: '2px',
+        transition: 'background-color 0.3s'
     }
 };
