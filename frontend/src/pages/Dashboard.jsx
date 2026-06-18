@@ -85,7 +85,7 @@ export default function Dashboard() {
                 {rdvs.length === 0 ? (
                     <div style={styles.vide}>
                         <p>Aucun rendez-vous aujourd'hui</p>
-                        <Link to="/rendez-vous" style={styles.boutonAjouter}>
+                        <Link to={`/booking/${entreprise?.id}`} style={styles.boutonAjouter}>
                             + Ajouter un rendez-vous
                         </Link>
                     </div>

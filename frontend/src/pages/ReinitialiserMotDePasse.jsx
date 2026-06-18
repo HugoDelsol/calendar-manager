@@ -1,86 +1,82 @@
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import axios from '../api/axios';
-import { useAuth } from '../context/AuthContext';
 
-export default function Login() {
-    const { login } = useAuth();
+export default function ReinitialiserMotDePasse() {
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
     const navigate = useNavigate();
 
-    const location = useLocation();
-    const messageSucces = location.state?.message;
-
-    const [form, setForm] = useState({ email: '', mot_de_passe: '' });
+    const [form, setForm] = useState({ nouveau: '', confirmation: '' });
     const [erreur, setErreur] = useState('');
     const [chargement, setChargement] = useState(false);
-
-    function handleChange(e) {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    }
 
     async function handleSubmit(e) {
         e.preventDefault();
         setErreur('');
-        setChargement(true);
 
+        if (form.nouveau !== form.confirmation) {
+            return setErreur('Les mots de passe ne correspondent pas');
+        }
+        if (form.nouveau.length < 8) {
+            return setErreur('8 caractères minimum');
+        }
+
+        setChargement(true);
         try {
-            const res = await axios.post('/auth/login', form);
-            login(res.data.token, res.data.entreprise);
-            navigate('/');
+            await axios.post('/auth/reinitialiser-mot-de-passe', {
+                token,
+                nouveau_mot_de_passe: form.nouveau
+            });
+            navigate('/login', { state: { message: 'Mot de passe réinitialisé, connectez-vous !' } });
         } catch (err) {
-            setErreur(err.response?.data?.error || 'Erreur de connexion');
+            setErreur(err.response?.data?.error || 'Lien invalide ou expiré');
         } finally {
             setChargement(false);
         }
     }
 
+    if (!token) return (
+        <div style={styles.container}>
+            <div style={styles.card}>
+                <p style={styles.erreur}>Lien invalide.</p>
+                <Link to="/login">Retour à la connexion</Link>
+            </div>
+        </div>
+    );
+
     return (
         <div style={styles.container}>
             <div style={styles.card}>
-                <h1 style={styles.titre}>Connexion</h1>
-                <p style={styles.sousTitre}>Gérez vos rendez-vous</p>
-
+                <h1 style={styles.titre}>Nouveau mot de passe</h1>
                 {erreur && <p style={styles.erreur}>{erreur}</p>}
-                {messageSucces && <p style={styles.succes}>{messageSucces}</p>}
-
                 <form onSubmit={handleSubmit} style={styles.form}>
                     <div style={styles.champ}>
-                        <label style={styles.label}>Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            style={styles.input}
-                            placeholder="contact@monentreprise.fr"
-                            required
-                        />
-                    </div>
-
-                    <div style={styles.champ}>
-                        <label style={styles.label}>Mot de passe</label>
+                        <label style={styles.label}>Nouveau mot de passe</label>
                         <input
                             type="password"
-                            name="mot_de_passe"
-                            value={form.mot_de_passe}
-                            onChange={handleChange}
+                            value={form.nouveau}
+                            onChange={e => setForm({ ...form, nouveau: e.target.value })}
                             style={styles.input}
                             placeholder="••••••••"
                             required
                         />
                     </div>
-
+                    <div style={styles.champ}>
+                        <label style={styles.label}>Confirmer</label>
+                        <input
+                            type="password"
+                            value={form.confirmation}
+                            onChange={e => setForm({ ...form, confirmation: e.target.value })}
+                            style={styles.input}
+                            placeholder="••••••••"
+                            required
+                        />
+                    </div>
                     <button type="submit" style={styles.bouton} disabled={chargement}>
-                        {chargement ? 'Connexion...' : 'Se connecter'}
+                        {chargement ? 'Mise à jour...' : 'Réinitialiser'}
                     </button>
                 </form>
-
-                <p style={styles.lien}>
-                    Pas encore de compte ? <Link to="/inscription">S'inscrire</Link>
-                </p>
-                <p style={styles.lien}>
-                    <Link to="/mot-de-passe-oublie">Mot de passe oublié ?</Link>
-                </p>
             </div>
         </div>
     );
@@ -102,14 +98,9 @@ const styles = {
         maxWidth: '400px'
     },
     titre: {
-        margin: '0 0 8px 0',
-        color: '#333',
-        fontSize: '28px'
-    },
-    sousTitre: {
         margin: '0 0 24px 0',
-        color: '#888',
-        fontSize: '14px'
+        color: '#333',
+        fontSize: '24px'
     },
     erreur: {
         backgroundColor: '#fee2e2',
@@ -147,15 +138,8 @@ const styles = {
         color: 'white',
         border: 'none',
         borderRadius: '8px',
-        fontSize: '16px',
+        fontSize: '15px',
         fontWeight: '600',
-        cursor: 'pointer',
-        marginTop: '8px'
-    },
-    lien: {
-        textAlign: 'center',
-        marginTop: '20px',
-        fontSize: '14px',
-        color: '#888'
+        cursor: 'pointer'
     }
 };

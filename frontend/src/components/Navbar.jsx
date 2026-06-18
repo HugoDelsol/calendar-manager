@@ -7,6 +7,7 @@ const liens = [
     { path: '/clients', label: '👥 Clients' },
     { path: '/services', label: '✂️ Services' },
     { path: '/horaires', label: '🕐 Horaires' },
+    { path: '/rappels', label: '🔔 Rappels' },
     { path: '/parametres', label: '⚙️ Paramètres' },
 ];
 
@@ -23,8 +24,13 @@ export default function Navbar() {
     return (
         <nav style={styles.nav}>
             <div style={styles.logo}>
-                <span style={styles.logoTexte}>📆 {entreprise?.nom}</span>
-                <span style={styles.secteur}>{entreprise?.secteur}</span>
+                <img style={styles.logoNav} src="/calendrier2.png" alt="" />
+                <p>
+                    <span style={styles.logoTexte}> {entreprise?.nom} </span>
+                    .
+                    <span style={styles.secteur}> {entreprise?.secteur}</span>
+                </p>
+
             </div>
 
             <div style={styles.liens}>
@@ -61,12 +67,16 @@ const styles = {
     },
     logo: {
         display: 'flex',
-        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     logoTexte: {
         color: 'white',
         fontWeight: '700',
         fontSize: '16px'
+    },
+    logoNav: {
+        height: '40px'
     },
     secteur: {
         color: 'rgba(255,255,255,0.7)',

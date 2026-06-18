@@ -27,6 +27,7 @@ app.use('/api/rendez-vous', require('./routes/rendezVous'));
 app.use('/api/horaires', require('./routes/horaires'));
 app.use('/api/fermetures', require('./routes/fermetures'));
 app.use('/api/public', require('./routes/public'));
+app.use('/api/rappels', require('./routes/rappels'));
 
 app.get('/', (req, res) => res.send('API Gestion RDV - OK'));
 

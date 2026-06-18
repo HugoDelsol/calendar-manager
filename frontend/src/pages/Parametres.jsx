@@ -10,6 +10,7 @@ export default function Parametres() {
 
     const [form, setForm] = useState({
         nom: entreprise?.nom || '',
+        email: entreprise?.email || '',
         telephone: entreprise?.telephone || '',
         secteur: entreprise?.secteur || '',
         delai_rappel_heures: entreprise?.delai_rappel_heures || 24
@@ -166,6 +167,8 @@ export default function Parametres() {
                             required
                         />
                     </div>
+                    <p>test</p>
+                    <p>{formMotDePasse.ancien}</p>
 
                     <div style={styles.champ}>
                         <label style={styles.label}>Nouveau mot de passe</label>
@@ -204,15 +207,15 @@ export default function Parametres() {
                 <h2 style={styles.sectionTitre}>Informations du compte</h2>
                 <div style={styles.infoLigne}>
                     <span style={styles.infoLabel}>Email</span>
-                    <span style={styles.infoValeur}>{entreprise?.email}</span>
+                    <span style={styles.infoValeur}>{form?.email}</span>
                 </div>
                 <div style={styles.infoLigne}>
                     <span style={styles.infoLabel}>Secteur</span>
-                    <span style={styles.infoValeur}>{entreprise?.secteur}</span>
+                    <span style={styles.infoValeur}>{form?.secteur}</span>
                 </div>
                 <div style={styles.infoLigne}>
                     <span style={styles.infoLabel}>Délai rappel actuel</span>
-                    <span style={styles.infoValeur}>{entreprise?.delai_rappel_heures}h avant le RDV</span>
+                    <span style={styles.infoValeur}>{form?.delai_rappel_heures}h avant le RDV</span>
                 </div>
             </div>
         </div>

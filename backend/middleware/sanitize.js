@@ -9,6 +9,14 @@ function valider(req, res, next) {
     next();
 }
 
+const reglesTemplate = [
+    body('titre').trim().notEmpty().withMessage('Titre requis').isLength({ max: 255 }).stripLow(),
+    body('message').optional().trim().isLength({ max: 1000 }).stripLow(),
+    body('delai_jours').isInt({ min: 1 }).withMessage('Délai invalide'),
+    body('service_id').optional({ checkFalsy: true }).isInt({ min: 1 }),
+    body('actif').optional().isBoolean()
+];
+
 const reglesInscription = [
     body('nom').trim().notEmpty().withMessage('Nom requis').isLength({ max: 150 }),
     body('email').trim().isEmail().withMessage('Email invalide').normalizeEmail({ gmail_remove_dots: false }),
@@ -78,5 +86,6 @@ module.exports = {
     reglesFermeture,
     reglesEntreprise,
     reglesInscription,
-    reglesLogin
+    reglesLogin,
+    reglesTemplate
 };

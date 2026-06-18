@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const entrepriseModel = require('../models/entrepriseModel');
 const { limiterAuth } = require('../middleware/rateLimiter');
 const { reglesInscription, reglesLogin, valider } = require('../middleware/sanitize');
+const emailService = require('../services/emailService');
 
 
 // POST /api/auth/inscription
@@ -66,6 +68,61 @@ router.post('/login', limiterAuth, reglesLogin, valider, async (req, res) => {
                 delai_rappel_heures: entreprise.delai_rappel_heures
             }
         });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST /api/auth/mot-de-passe-oublie
+router.post('/mot-de-passe-oublie', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ error: 'Email requis' });
+
+        const entreprise = await entrepriseModel.getEntrepriseByEmail(email);
+
+        // On répond toujours OK pour ne pas révéler si l'email existe
+        if (!entreprise) {
+            return res.json({ message: 'Si cet email existe, un lien de réinitialisation a été envoyé' });
+        }
+
+        // Génère un token unique
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiry = new Date(Date.now() + 60 * 60 * 1000); // expire dans 1h
+
+        await entrepriseModel.saveResetToken(email, token, expiry);
+
+        // Envoie l'email
+        await emailService.envoyerResetMotDePasse(email, entreprise.nom, token);
+
+        res.json({ message: 'Si cet email existe, un lien de réinitialisation a été envoyé' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST /api/auth/reinitialiser-mot-de-passe
+router.post('/reinitialiser-mot-de-passe', async (req, res) => {
+    try {
+        const { token, nouveau_mot_de_passe } = req.body;
+        if (!token || !nouveau_mot_de_passe) {
+            return res.status(400).json({ error: 'Token et nouveau mot de passe requis' });
+        }
+
+        if (nouveau_mot_de_passe.length < 8) {
+            return res.status(400).json({ error: '8 caractères minimum' });
+        }
+
+        const entreprise = await entrepriseModel.getEntrepriseByResetToken(token);
+        if (!entreprise) {
+            return res.status(400).json({ error: 'Lien invalide ou expiré' });
+        }
+
+        const hash = await bcrypt.hash(nouveau_mot_de_passe, 10);
+        await entrepriseModel.updateMotDePasse(entreprise.id, hash);
+        await entrepriseModel.clearResetToken(entreprise.id);
+
+        res.json({ message: 'Mot de passe réinitialisé avec succès' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

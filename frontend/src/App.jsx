@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
@@ -9,8 +10,11 @@ import Clients from './pages/Clients';
 import RendezVous from './pages/RendezVous';
 import Horaires from './pages/Horaires';
 import Parametres from './pages/Parametres';
-import { useAuth } from './context/AuthContext';
 import Booking from './pages/Booking';
+import RappelTemplates from './pages/RappelTemplates';
+import MotDePasseOublie from './pages/MotDePasseOublie';
+import ReinitialiserMotDePasse from './pages/ReinitialiserMotDePasse';
+
 
 export default function App() {
     const { token } = useAuth();
@@ -23,6 +27,8 @@ export default function App() {
                 <Route path="/login" element={!token ? <Login /> : <Navigate to="/" replace />} />
                 <Route path="/inscription" element={!token ? <Inscription /> : <Navigate to="/" replace />} />
                 <Route path="/booking/:entrepriseId" element={<Booking />} />
+                <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+                <Route path="/reinitialiser-mot-de-passe" element={<ReinitialiserMotDePasse />} />
 
                 {/* Routes protégées */}
                 <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -31,6 +37,8 @@ export default function App() {
                 <Route path="/rendez-vous" element={<ProtectedRoute><RendezVous /></ProtectedRoute>} />
                 <Route path="/horaires" element={<ProtectedRoute><Horaires /></ProtectedRoute>} />
                 <Route path="/parametres" element={<ProtectedRoute><Parametres /></ProtectedRoute>} />
+                <Route path="/rappels" element={<ProtectedRoute><RappelTemplates /></ProtectedRoute>} />
+
 
                 {/* Redirige les routes inconnues */}
                 <Route path="*" element={<Navigate to="/" replace />} />

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const publicModel = require('../models/publicModel');
 const clientModel = require('../models/clientModel');
-const { envoyerConfirmation } = require('../services/emailService');
+const emailService = require('../services/emailService');
 
 function genererCreneaux(plages, dureeMinutes, rdvsExistants, dateStr) {
     const creneaux = [];
@@ -130,7 +130,7 @@ router.post('/:entrepriseId/reserver', async (req, res) => {
 
         // Email de confirmation
         const entreprise = await publicModel.getEntrepriseInfo(entrepriseId);
-        await envoyerConfirmation(email, nom, service.nom, date_heure, entreprise.nom);
+        await emailService.envoyerConfirmationEmail(email, nom, service.nom, date_heure, entreprise.nom);
 
         res.status(201).json({
             message: 'Rendez-vous confirmé ! Un email de confirmation vous a été envoyé.',

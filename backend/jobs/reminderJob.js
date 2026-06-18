@@ -3,7 +3,7 @@ const rdvModel = require('../models/rdvModel');
 const emailService = require('../services/emailService');
 
 function démarrerReminderJob() {
-    
+
     cron.schedule('*/15 * * * *', async () => {
         console.log('Vérification des rappels à envoyer...');
 
@@ -40,7 +40,29 @@ function démarrerReminderJob() {
         }
     });
 
+    // Rappels post-RDV (templates) — chaque jour à 09h00
+    cron.schedule('0 9 * * *', async () => {
+        console.log('Vérification des rappels post-RDV...');
+        try {
+            const rappels = await rappelModel.getRappelsDuJour();
+            if (rappels.length === 0) return console.log('Aucun rappel post-RDV aujourd\'hui.');
+
+            for (const rappel of rappels) {
+                try {
+                    await emailService.envoyerRappelPostRdv(rappel);
+                    await rappelModel.marquerRappelEnvoye(rappel.id);
+                    console.log(`Rappel post-RDV envoyé à ${rappel.client_email}`);
+                } catch (err) {
+                    console.error(`Échec rappel post-RDV #${rappel.id}:`, err.message);
+                }
+            }
+        } catch (err) {
+            console.error('Erreur rappels post-RDV:', err.message);
+        }
+    });
+
     console.log('Reminder job démarré (vérification toutes les 15 minutes)');
 }
+
 
 module.exports = { démarrerReminderJob };

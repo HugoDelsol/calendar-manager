@@ -5,6 +5,7 @@ const serviceModel = require('../models/serviceModel');
 const horaireModel = require('../models/horaireModel');
 const fermetureModel = require('../models/fermetureModel');
 const { reglesRdv, valider } = require('../middleware/sanitize');
+const rappelModel = require('../models/rappelModel');
 
 const authMiddleware = require('../middleware/auth');
 router.use(authMiddleware);
@@ -62,7 +63,7 @@ router.post('/', reglesRdv, valider, async (req, res) => {
     }
 });
 
-router.put('/:id', reglesRdv, valider, async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const { date_heure, statut } = req.body;
         if (!date_heure || !statut) return res.status(400).json({ error: 'date_heure et statut sont requis' });
@@ -75,6 +76,19 @@ router.put('/:id', reglesRdv, valider, async (req, res) => {
         if (!disponible) return res.status(409).json({ error: 'Ce créneau est déjà réservé' });
 
         await rdvModel.updateRdv(req.params.id, req.entrepriseId, date_heure, statut);
+
+        // Génère les rappels si le RDV vient d'être marqué terminé
+        if (statut === 'termine' && rdv.statut !== 'termine') {
+            const nbRappels = await rappelModel.genererRappels(
+                req.entrepriseId,
+                req.params.id,
+                rdv.service_id,
+                rdv.client_id,
+                date_heure
+            );
+            console.log(`${nbRappels} rappel(s) généré(s) pour le RDV #${req.params.id}`);
+        }
+
         const rdvMaj = await rdvModel.getRdvById(req.params.id, req.entrepriseId);
         res.json(rdvMaj);
     } catch (err) {

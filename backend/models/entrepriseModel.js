@@ -39,11 +39,36 @@ async function updateMotDePasse(id, hash) {
     await pool.query('UPDATE entreprises SET mot_de_passe = ? WHERE id = ?', [hash, id]);
 }
 
+async function saveResetToken(email, token, expiry) {
+    await pool.query(
+        'UPDATE entreprises SET reset_token = ?, reset_token_expiry = ? WHERE email = ?',
+        [token, expiry, email]
+    );
+}
+
+async function getEntrepriseByResetToken(token) {
+    const [rows] = await pool.query(
+        'SELECT * FROM entreprises WHERE reset_token = ? AND reset_token_expiry > NOW()',
+        [token]
+    );
+    return rows[0];
+}
+
+async function clearResetToken(id) {
+    await pool.query(
+        'UPDATE entreprises SET reset_token = NULL, reset_token_expiry = NULL WHERE id = ?',
+        [id]
+    );
+}
+
 module.exports = {
     getAllEntreprises,
     getEntrepriseById,
     getEntrepriseByEmail,
     createEntreprise,
     updateEntreprise,
-    updateMotDePasse
+    updateMotDePasse,
+    saveResetToken,
+    getEntrepriseByResetToken,
+    clearResetToken,
 };
