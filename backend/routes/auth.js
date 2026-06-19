@@ -7,10 +7,11 @@ const entrepriseModel = require('../models/entrepriseModel');
 const { limiterAuth } = require('../middleware/rateLimiter');
 const { reglesInscription, reglesLogin, regleMotDePasse, valider } = require('../middleware/sanitize');
 const emailService = require('../services/emailService');
+const { error } = require('console');
 
 
 // POST /api/auth/inscription
-router.post('/inscription', limiterAuth, reglesInscription, valider, async (req, res) => {
+router.post('/inscription', limiterAuth, reglesInscription, valider, async (req, res, next) => {
     try {
         const { nom, email, mot_de_passe, telephone, secteur, delai_rappel_heures } = req.body;
 
@@ -30,12 +31,12 @@ router.post('/inscription', limiterAuth, reglesInscription, valider, async (req,
 
         res.status(201).json({ token, entreprise: { id, nom, email, telephone, secteur } });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
 // POST /api/auth/login
-router.post('/login', limiterAuth, reglesLogin, valider, async (req, res) => {
+router.post('/login', limiterAuth, reglesLogin, valider, async (req, res, next) => {
     try {
         const { email, mot_de_passe } = req.body;
 
@@ -69,12 +70,12 @@ router.post('/login', limiterAuth, reglesLogin, valider, async (req, res) => {
             }
         });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
 // POST /api/auth/mot-de-passe-oublie
-router.post('/mot-de-passe-oublie', async (req, res) => {
+router.post('/mot-de-passe-oublie', async (req, res, next) => {
     try {
         const { email } = req.body;
         if (!email) return res.status(400).json({ error: 'Email requis' });
@@ -97,12 +98,12 @@ router.post('/mot-de-passe-oublie', async (req, res) => {
 
         res.json({ message: 'Si cet email existe, un lien de réinitialisation a été envoyé' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
 // POST /api/auth/reinitialiser-mot-de-passe
-router.post('/reinitialiser-mot-de-passe', regleMotDePasse, valider, async (req, res) => {
+router.post('/reinitialiser-mot-de-passe', regleMotDePasse, valider, async (req, res, next) => {
     try {
         const { token, nouveau_mot_de_passe } = req.body;
         if (!token || !nouveau_mot_de_passe) {
@@ -120,11 +121,12 @@ router.post('/reinitialiser-mot-de-passe', regleMotDePasse, valider, async (req,
 
         const hash = await bcrypt.hash(nouveau_mot_de_passe, 10);
         await entrepriseModel.updateMotDePasse(entreprise.id, hash);
+        //await entrepriseModel.revoquerTokensExistants(entreprise.id);
         await entrepriseModel.clearResetToken(entreprise.id);
 
         res.json({ message: 'Mot de passe réinitialisé avec succès' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

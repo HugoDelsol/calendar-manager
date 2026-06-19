@@ -9,6 +9,8 @@ export default function Booking() {
     const { entrepriseId } = useParams();
     const { token, entreprise: entrepriseConnectee } = useAuth();
     const [clients, setClients] = useState([]);
+    const [fermetures, setFermetures] = useState([]);
+    const [horairesOuverture, setHorairesOuverture] = useState([]);
     const [nouveauClient, setNouveauClient] = useState(false);
     const [formNouveauClient, setFormNouveauClient] = useState({
         nom: '', telephone: '', email: '', adresse: '', informations: ''
@@ -45,12 +47,16 @@ export default function Booking() {
 
         async function charger() {
             try {
-                const [entrepriseRes, servicesRes] = await Promise.all([
+                const [entrepriseRes, servicesRes, fermeturesRes, horairesRes] = await Promise.all([
                     axios.get(`/public/${entrepriseId}/info`),
-                    axios.get(`/public/${entrepriseId}/services`)
+                    axios.get(`/public/${entrepriseId}/services`),
+                    axios.get(`/public/${entrepriseId}/fermetures`),
+                    axios.get(`/public/${entrepriseId}/horaires`)
                 ]);
                 setEntreprise(entrepriseRes.data);
                 setServices(servicesRes.data);
+                setFermetures(fermeturesRes.data);
+                setHorairesOuverture(horairesRes.data);
 
                 // Si entreprise connectée, charge ses clients
                 if (token) {
@@ -176,6 +182,26 @@ export default function Booking() {
         });
     }
 
+    function formaterDateCourte(date) {
+        return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    }
+
+    const JOURS_LABELS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+    function getHorairesFormates() {
+        const parJour = {};
+        horairesOuverture.forEach(h => {
+            if (!parJour[h.jour_semaine]) parJour[h.jour_semaine] = [];
+            parJour[h.jour_semaine].push(`${h.heure_debut.slice(0, 5)}-${h.heure_fin.slice(0, 5)}`);
+        });
+        return Object.keys(parJour)
+            .sort((a, b) => a - b)
+            .map(jour => ({
+                label: JOURS_LABELS[jour],
+                plages: parJour[jour].join(', ')
+            }));
+    }
+
     // Affiche un message si accès refusé, avant tout le reste
     if (accesRefuse) {
         return (
@@ -272,6 +298,36 @@ export default function Booking() {
                             <strong>{selection.service?.nom}</strong>
                             <span>{selection.service?.duree_minutes} min — {selection.service?.prix} €</span>
                         </div>
+
+                        {(horairesOuverture.length > 0 || fermetures.length > 0) && (
+                            <div style={styles.infoEncart}>
+                                {horairesOuverture.length > 0 && (
+                                    <div style={styles.infoSection}>
+                                        <span style={styles.infoLabel}>🕐 Horaires d'ouverture</span>
+                                        <div style={styles.horairesListe}>
+                                            {getHorairesFormates().map(h => (
+                                                <span key={h.label} style={styles.horaireLigne}>
+                                                    <strong>{h.label}</strong> {h.plages}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {fermetures.length > 0 && (
+                                    <div style={styles.infoSection}>
+                                        <span style={styles.infoLabel}>🔒 Périodes de fermeture</span>
+                                        <div style={styles.fermeturesBadges}>
+                                            {fermetures.map(f => (
+                                                <span key={f.id} style={styles.fermetureBadge}>
+                                                    {formaterDateCourte(f.date_debut)} – {formaterDateCourte(f.date_fin)}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         <div style={styles.champ}>
                             <label style={styles.label}>Date souhaitée</label>
@@ -872,5 +928,49 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
+    },
+    infoEncart: {
+        marginBottom: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px'
+    },
+    infoSection: {
+        borderRadius: '10px',
+        padding: '16px 20px',
+        backgroundColor: '#f8f8ff',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px'
+    },
+    infoLabel: {
+        fontSize: '12px',
+        color: '#6366f1',
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        letterSpacing: '0.3px'
+    },
+    horairesListe: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '3px'
+    },
+    horaireLigne: {
+        fontSize: '13px',
+        color: '#555',
+        textAlign: 'left'
+    },
+    fermeturesBadges: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '6px'
+    },
+    fermetureBadge: {
+        fontSize: '12px',
+        color: '#92400e',
+        backgroundColor: '#fef3c7',
+        padding: '4px 10px',
+        borderRadius: '6px',
+        fontWeight: '500'
     }
 };

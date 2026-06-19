@@ -69,6 +69,7 @@ export default function Parametres() {
                 ancien: formMotDePasse.ancien,
                 nouveau: formMotDePasse.nouveau
             });
+
             setSucces('Mot de passe mis à jour avec succès');
             setFormMotDePasse({ ancien: '', nouveau: '', confirmation: '' });
         } catch (err) {
@@ -167,8 +168,6 @@ export default function Parametres() {
                             required
                         />
                     </div>
-                    <p>test</p>
-                    <p>{formMotDePasse.ancien}</p>
 
                     <div style={styles.champ}>
                         <label style={styles.label}>Nouveau mot de passe</label>
@@ -283,7 +282,7 @@ const styles = {
         border: '1px solid #ddd',
         fontSize: '14px',
         outline: 'none',
-        fontFamily: 'inherit',  
+        fontFamily: 'inherit',
         backgroundColor: 'rgb(248, 248, 255)'
     },
     bouton: {

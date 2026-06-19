@@ -13,7 +13,7 @@ export default function RendezVous() {
     const { entreprise } = useAuth();
     const [rdvs, setRdvs] = useState([]);
     const [clients, setClients] = useState([]);
-    const [services, setServices] = useState([]);
+    const [services, setServices] = useState([]);    
     const [chargement, setChargement] = useState(true);
     const [afficherTout, setAfficherTout] = useState(false);
     const [afficherFormulaire, setAfficherFormulaire] = useState(false);
@@ -29,14 +29,15 @@ export default function RendezVous() {
 
     async function chargerDonnees() {
         try {
-            const [rdvRes, clientRes, serviceRes] = await Promise.all([
+            const [rdvRes, clientRes, serviceRes, fermeturesRes] = await Promise.all([
                 axios.get('/rendez-vous'),
                 axios.get('/clients'),
-                axios.get('/services')
+                axios.get('/services'),
             ]);
             setRdvs(rdvRes.data);
             setClients(clientRes.data);
             setServices(serviceRes.data);
+            setServices(serviceRes.data);      
         } catch (err) {
             console.error(err);
         } finally {

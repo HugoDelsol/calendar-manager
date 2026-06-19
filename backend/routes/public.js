@@ -4,33 +4,55 @@ const publicModel = require('../models/publicModel');
 const clientModel = require('../models/clientModel');
 const emailService = require('../services/emailService');
 const creneauxService = require('../services/creneauxService');
+const fermetureModel = require('../models/fermetureModel');
+const horaireModel = require('../models/horaireModel');
 const authOptionnel = require('../middleware/authOptionnel');
 const { reglesReservation, valider } = require('../middleware/sanitize');
 
 
 // GET /api/public/:entrepriseId/info
-router.get('/:entrepriseId/info', async (req, res) => {
+router.get('/:entrepriseId/info', async (req, res, next) => {
     try {
         const entreprise = await publicModel.getEntrepriseInfo(req.params.entrepriseId);
         if (!entreprise) return res.status(404).json({ error: 'Entreprise non trouvée' });
         res.json(entreprise);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
 // GET /api/public/:entrepriseId/services
-router.get('/:entrepriseId/services', async (req, res) => {
+router.get('/:entrepriseId/services', async (req, res, next) => {
     try {
         const services = await publicModel.getServices(req.params.entrepriseId);
         res.json(services);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
+    }
+});
+
+// GET /api/public/:entrepriseId/fermetures
+router.get('/:entrepriseId/fermetures', async (req, res, next) => {
+    try {
+        const fermetures = await fermetureModel.getFermetures(req.params.entrepriseId);
+        res.json(fermetures);
+    } catch (err) {
+        next(err);
+    }
+});
+
+// GET /api/public/:entrepriseId/horaires
+router.get('/:entrepriseId/horaires', async (req, res, next) => {
+    try {
+        const horaires = await horaireModel.getHoraires(req.params.entrepriseId);
+        res.json(horaires);
+    } catch (err) {
+        next(err);
     }
 });
 
 // GET /api/public/:entrepriseId/creneaux?date=2026-06-22&service_id=1
-router.get('/:entrepriseId/creneaux', async (req, res) => {
+router.get('/:entrepriseId/creneaux', async (req, res, next) => {
     try {
         const { date, service_id } = req.query;
         const { entrepriseId } = req.params;
@@ -56,16 +78,16 @@ router.get('/:entrepriseId/creneaux', async (req, res) => {
         if (!service) return res.status(404).json({ error: 'Service non trouvé' });
 
         const rdvsExistants = await publicModel.getRdvsExistants(entrepriseId, date);
-        const creneaux = creneauxService.genererCreneaux(plages, service.duree_minutes, rdvsExistants, date);
+        const creneaux = creneauxService.Creneaux(plages, service.duree_minutes, rdvsExistants, date);
 
         res.json({ creneaux });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
 // POST /api/public/:entrepriseId/reserver
-router.post('/:entrepriseId/reserver', authOptionnel, reglesReservation, valider, async (req, res) => {
+router.post('/:entrepriseId/reserver', authOptionnel, reglesReservation, valider, async (req, res, next) => {
     try {
         const { entrepriseId } = req.params;
         const { nom, telephone, email, service_id, date_heure, adresse, informations } = req.body;
@@ -108,7 +130,7 @@ router.post('/:entrepriseId/reserver', authOptionnel, reglesReservation, valider
             rdv_id: rdvId
         });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

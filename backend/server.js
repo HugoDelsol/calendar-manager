@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const { limiterGlobal } = require('./middleware/rateLimiter');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -28,6 +29,8 @@ app.use('/api/horaires', require('./routes/horaires'));
 app.use('/api/fermetures', require('./routes/fermetures'));
 app.use('/api/public', require('./routes/public'));
 app.use('/api/rappels', require('./routes/rappels'));
+
+app.use(errorHandler);
 
 app.get('/', (req, res) => res.send('API Gestion RDV - OK'));
 

@@ -184,9 +184,9 @@ export default function RappelTemplates() {
                                         value={form.service_id}
                                         onChange={handleChange}
                                         style={styles.input}
-
+                                        required
                                     >
-                                        <option value="">Tous les services</option>
+                                        <option value="">Choisir un service</option>
                                         {services.map(s => (
                                             <option key={s.id} value={s.id}>{s.nom}</option>
                                         ))}
@@ -259,7 +259,7 @@ export default function RappelTemplates() {
                                         ⏱ Envoyé {formaterDelai(template.delai_jours)} après le RDV
                                     </span>
                                     <span style={styles.metaItem}>
-                                        ✂️ {template.service_nom || 'Tous les services'}
+                                        ✂️ {template.service_nom}
                                     </span>
                                 </div>
                             </div>
@@ -312,7 +312,7 @@ const styles = {
         marginBottom: '32px'
     },
     titre: {
-        fontSize: '28px',  
+        fontSize: '28px',
         color: 'rgb(240, 240, 240)',
         margin: '0 0 10px 0',
         textAlign: 'left',

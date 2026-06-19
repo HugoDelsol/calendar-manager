@@ -13,6 +13,19 @@ async function getTemplates(entreprise_id) {
     return rows;
 }
 
+async function getTemplateActifParService(entreprise_id, service_id, excludeId = null) {
+    let query = 'SELECT id FROM rappel_templates WHERE entreprise_id = ? AND service_id = ? AND actif = TRUE';
+    const params = [entreprise_id, service_id];
+
+    if (excludeId) {
+        query += ' AND id != ?';
+        params.push(excludeId);
+    }
+
+    const [rows] = await pool.query(query, params);
+    return rows.length > 0;
+}
+
 async function createTemplate(entreprise_id, service_id, titre, message, delai_jours) {
     const [result] = await pool.query(
         'INSERT INTO rappel_templates (entreprise_id, service_id, titre, message, delai_jours) VALUES (?, ?, ?, ?, ?)',
@@ -103,5 +116,6 @@ module.exports = {
     genererRappels,
     getRappelsDuJour,
     marquerRappelEnvoye,
-    getRappelsProgrammes
+    getRappelsProgrammes,
+    getTemplateActifParService
 };

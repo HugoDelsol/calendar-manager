@@ -23,6 +23,7 @@ export default function App() {
         <>
             {token && <Navbar />}
             <Routes>
+                
                 {/* Routes publiques */}
                 <Route path="/login" element={!token ? <Login /> : <Navigate to="/" replace />} />
                 <Route path="/inscription" element={!token ? <Inscription /> : <Navigate to="/" replace />} />
@@ -38,7 +39,6 @@ export default function App() {
                 <Route path="/horaires" element={<ProtectedRoute><Horaires /></ProtectedRoute>} />
                 <Route path="/parametres" element={<ProtectedRoute><Parametres /></ProtectedRoute>} />
                 <Route path="/rappels" element={<ProtectedRoute><RappelTemplates /></ProtectedRoute>} />
-
 
                 {/* Redirige les routes inconnues */}
                 <Route path="*" element={<Navigate to="/" replace />} />

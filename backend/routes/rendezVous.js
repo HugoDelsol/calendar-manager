@@ -10,26 +10,26 @@ const rappelModel = require('../models/rappelModel');
 const authMiddleware = require('../middleware/auth');
 router.use(authMiddleware);
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
         const rdvs = await rdvModel.getAllRdv(req.entrepriseId);
         res.json(rdvs);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
     try {
         const rdv = await rdvModel.getRdvById(req.params.id, req.entrepriseId);
         if (!rdv) return res.status(404).json({ error: 'Rendez-vous non trouvé' });
         res.json(rdv);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-router.post('/', reglesRdv, valider, async (req, res) => {
+router.post('/', reglesRdv, valider, async (req, res, next) => {
     try {
         const { client_id, service_id, date_heure } = req.body;
         if (!client_id || !service_id || !date_heure) {
@@ -58,12 +58,11 @@ router.post('/', reglesRdv, valider, async (req, res) => {
         res.status(201).json(rdv);
 
     } catch (err) {
-        
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
     try {
         const { date_heure, statut } = req.body;
         if (!date_heure || !statut) return res.status(400).json({ error: 'date_heure et statut sont requis' });
@@ -92,16 +91,16 @@ router.put('/:id', async (req, res) => {
         const rdvMaj = await rdvModel.getRdvById(req.params.id, req.entrepriseId);
         res.json(rdvMaj);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
     try {
         await rdvModel.deleteRdv(req.params.id, req.entrepriseId);
         res.json({ message: 'Rendez-vous supprimé' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 

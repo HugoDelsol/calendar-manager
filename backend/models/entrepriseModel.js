@@ -61,6 +61,21 @@ async function clearResetToken(id) {
     );
 }
 
+async function revoquerTokensExistants(id) {
+    await pool.query(
+        'UPDATE entreprises SET tokens_revoques_avant = NOW() WHERE id = ?',
+        [id]
+    );
+}
+
+async function getDateRevocation(id) {
+    const [rows] = await pool.query(
+        'SELECT tokens_revoques_avant FROM entreprises WHERE id = ?',
+        [id]
+    );
+    return rows[0]?.tokens_revoques_avant;
+}
+
 module.exports = {
     getAllEntreprises,
     getEntrepriseById,
@@ -71,4 +86,6 @@ module.exports = {
     saveResetToken,
     getEntrepriseByResetToken,
     clearResetToken,
+    revoquerTokensExistants,
+    getDateRevocation,
 };

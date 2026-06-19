@@ -13,7 +13,7 @@ const reglesTemplate = [
     body('titre').trim().notEmpty().withMessage('Titre requis').isLength({ max: 255 }).stripLow(),
     body('message').optional().trim().isLength({ max: 1000 }).stripLow(),
     body('delai_jours').isInt({ min: 1 }).withMessage('Délai invalide'),
-    body('service_id').optional({ checkFalsy: true }).isInt({ min: 1 }),
+    body('service_id').isInt({ min: 1 }).withMessage('Service requis'),
     body('actif').optional().isBoolean()
 ];
 
@@ -71,12 +71,26 @@ const reglesRdv = [
 const reglesHoraire = [
     body('jour_semaine').isInt({ min: 0, max: 6 }).withMessage('Jour invalide'),
     body('heure_debut').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('Heure début invalide'),
-    body('heure_fin').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('Heure fin invalide')
+    body('heure_fin')
+        .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('Heure fin invalide')
+        .custom((value, { req }) => {
+            if (value <= req.body.heure_debut) {
+                throw new Error('L\'heure de fin doit être après l\'heure de début');
+            }
+            return true;
+        })
 ];
 
 const reglesFermeture = [
     body('date_debut').isDate().withMessage('Date début invalide'),
-    body('date_fin').isDate().withMessage('Date fin invalide'),
+    body('date_fin')
+        .isDate().withMessage('Date fin invalide')
+        .custom((value, { req }) => {
+            if (value < req.body.date_debut) {
+                throw new Error('La date de fin doit être après la date de début');
+            }
+            return true;
+        }),
     body('motif').optional().trim().isLength({ max: 255 }).stripLow()
 ];
 
