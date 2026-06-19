@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const clientModel = require('../models/clientModel');
+const publicModel = require('../models/publicModel');
 const { reglesClient, valider } = require('../middleware/sanitize');
 
 const authMiddleware = require('../middleware/auth');
@@ -29,8 +30,15 @@ router.post('/', reglesClient, valider, async (req, res) => {
     try {
         const { nom, telephone, email, informations, adresse } = req.body;
         if (!nom || !telephone) return res.status(400).json({ error: 'nom et telephone sont requis' });
+
+        const clientExistant = await publicModel.getClientByEmail(email, req.entrepriseId);
+        if (clientExistant) {
+            return res.status(409).json({ error: 'Un client avec cet email existe déjà' });
+        }
+
         const id = await clientModel.createClient(req.entrepriseId, nom, telephone, email, informations, adresse);
         res.status(201).json({ id, nom, telephone, email });
+        
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

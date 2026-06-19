@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const entrepriseModel = require('../models/entrepriseModel');
 const { limiterAuth } = require('../middleware/rateLimiter');
-const { reglesInscription, reglesLogin, valider } = require('../middleware/sanitize');
+const { reglesInscription, reglesLogin, regleMotDePasse, valider } = require('../middleware/sanitize');
 const emailService = require('../services/emailService');
 
 
@@ -102,7 +102,7 @@ router.post('/mot-de-passe-oublie', async (req, res) => {
 });
 
 // POST /api/auth/reinitialiser-mot-de-passe
-router.post('/reinitialiser-mot-de-passe', async (req, res) => {
+router.post('/reinitialiser-mot-de-passe', regleMotDePasse, valider, async (req, res) => {
     try {
         const { token, nouveau_mot_de_passe } = req.body;
         if (!token || !nouveau_mot_de_passe) {

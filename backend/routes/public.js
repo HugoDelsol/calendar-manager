@@ -3,43 +3,10 @@ const router = express.Router();
 const publicModel = require('../models/publicModel');
 const clientModel = require('../models/clientModel');
 const emailService = require('../services/emailService');
+const creneauxService = require('../services/creneauxService');
+const authOptionnel = require('../middleware/authOptionnel');
+const { reglesReservation, valider } = require('../middleware/sanitize');
 
-function genererCreneaux(plages, dureeMinutes, rdvsExistants, dateStr) {
-    const creneaux = [];
-    const maintenant = new Date();
-
-    for (const plage of plages) {
-        const [hDebut, mDebut] = plage.heure_debut.slice(0, 5).split(':').map(Number);
-        const [hFin, mFin] = plage.heure_fin.slice(0, 5).split(':').map(Number);
-
-        let cursor = hDebut * 60 + mDebut;
-        const fin = hFin * 60 + mFin;
-
-        while (cursor + dureeMinutes <= fin) {
-            const heures = String(Math.floor(cursor / 60)).padStart(2, '0');
-            const minutes = String(cursor % 60).padStart(2, '0');
-            const creneauStr = `${dateStr}T${heures}:${minutes}:00`;
-            const heureDebut = new Date(creneauStr);
-            const heureFin = new Date(heureDebut.getTime() + dureeMinutes * 60000);
-
-            if (heureDebut <= maintenant) {
-                cursor += dureeMinutes;
-                continue;
-            }
-
-            const chevauche = rdvsExistants.some(rdv => {
-                const rdvDebut = new Date(rdv.date_heure);
-                const rdvFin = new Date(rdvDebut.getTime() + rdv.duree_minutes * 60000);
-                return heureDebut < rdvFin && heureFin > rdvDebut;
-            });
-
-            if (!chevauche) creneaux.push(creneauStr);
-            cursor += dureeMinutes;
-        }
-    }
-
-    return creneaux;
-}
 
 // GET /api/public/:entrepriseId/info
 router.get('/:entrepriseId/info', async (req, res) => {
@@ -89,7 +56,7 @@ router.get('/:entrepriseId/creneaux', async (req, res) => {
         if (!service) return res.status(404).json({ error: 'Service non trouvé' });
 
         const rdvsExistants = await publicModel.getRdvsExistants(entrepriseId, date);
-        const creneaux = genererCreneaux(plages, service.duree_minutes, rdvsExistants, date);
+        const creneaux = creneauxService.genererCreneaux(plages, service.duree_minutes, rdvsExistants, date);
 
         res.json({ creneaux });
     } catch (err) {
@@ -98,10 +65,14 @@ router.get('/:entrepriseId/creneaux', async (req, res) => {
 });
 
 // POST /api/public/:entrepriseId/reserver
-router.post('/:entrepriseId/reserver', async (req, res) => {
+router.post('/:entrepriseId/reserver', authOptionnel, reglesReservation, valider, async (req, res) => {
     try {
         const { entrepriseId } = req.params;
-        const { nom, telephone, email, service_id, date_heure } = req.body;
+        const { nom, telephone, email, service_id, date_heure, adresse, informations } = req.body;
+
+        if (req.entrepriseIdConnectee && parseInt(entrepriseId) !== req.entrepriseIdConnectee) {
+            return res.status(403).json({ error: 'Action non autorisée' });
+        }
 
         if (!nom || !telephone || !email || !service_id || !date_heure) {
             return res.status(400).json({ error: 'Tous les champs sont requis' });
@@ -122,7 +93,7 @@ router.post('/:entrepriseId/reserver', async (req, res) => {
         if (client) {
             clientId = client.id;
         } else {
-            clientId = await clientModel.createClient(entrepriseId, nom, telephone, email);
+            clientId = await clientModel.createClient(entrepriseId, nom, telephone, email, informations, adresse);
         }
 
         // Crée le RDV

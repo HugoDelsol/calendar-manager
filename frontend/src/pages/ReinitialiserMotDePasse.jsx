@@ -18,9 +18,6 @@ export default function ReinitialiserMotDePasse() {
         if (form.nouveau !== form.confirmation) {
             return setErreur('Les mots de passe ne correspondent pas');
         }
-        if (form.nouveau.length < 8) {
-            return setErreur('8 caractères minimum');
-        }
 
         setChargement(true);
         try {
@@ -35,6 +32,19 @@ export default function ReinitialiserMotDePasse() {
             setChargement(false);
         }
     }
+
+    function evaluerForce(mdp) {
+        let force = 0;
+        if (mdp.length >= 8) force++;
+        if (/[A-Z]/.test(mdp)) force++;
+        if (/[a-z]/.test(mdp)) force++;
+        if (/[0-9]/.test(mdp)) force++;
+        if (/[@$!%*?&_\-#]/.test(mdp)) force++;
+        return force;
+    }
+
+    const force = evaluerForce(form.nouveau);
+    const forceCouleurs = ['#ddd', '#dc2626', '#f97316', '#eab308', '#16a34a', '#15803d'];
 
     if (!token) return (
         <div style={styles.container}>
@@ -61,6 +71,18 @@ export default function ReinitialiserMotDePasse() {
                             placeholder="••••••••"
                             required
                         />
+                        {form.nouveau && (
+                            <>
+                                <div style={styles.barreForceContainer}>
+                                    {[1, 2, 3, 4, 5].map(i => (
+                                        <div key={i} style={{
+                                            ...styles.barreForceSegment,
+                                            backgroundColor: i <= force ? forceCouleurs[force] : '#ddd'
+                                        }} />
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
                     <div style={styles.champ}>
                         <label style={styles.label}>Confirmer</label>
@@ -141,5 +163,16 @@ const styles = {
         fontSize: '15px',
         fontWeight: '600',
         cursor: 'pointer'
-    }
+    },
+    barreForceContainer: {
+        display: 'flex',
+        gap: '4px',
+        marginTop: '6px'
+    },
+    barreForceSegment: {
+        height: '4px',
+        flex: 1,
+        borderRadius: '2px',
+        transition: 'background-color 0.3s'
+    },
 };

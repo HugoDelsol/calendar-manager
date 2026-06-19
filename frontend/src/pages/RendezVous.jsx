@@ -247,9 +247,11 @@ export default function RendezVous() {
             {rdvsAffiches.length === 0 ? (
                 <div style={styles.vide}>
                     <p>{afficherTout ? 'Aucun rendez-vous' : 'Aucun rendez-vous cette semaine'}</p>
-                    <button onClick={() => ouvrirFormulaire()} style={styles.boutonAjouter}>
-                        + Créer un rendez-vous
-                    </button>
+                    <Link
+                        to={`/booking/${entreprise?.id}`}
+                    >
+                        <button style={styles.boutonAjouter}>+ Créer un rendez-vous</button>
+                    </Link>
                 </div>
             ) : (
                 <div style={styles.liste}>

@@ -7,7 +7,7 @@ const ETAPES = ['Service', 'Date & Créneau', 'Vos infos', 'Confirmation'];
 
 export default function Booking() {
     const { entrepriseId } = useParams();
-    const { token } = useAuth();
+    const { token, entreprise: entrepriseConnectee } = useAuth();
     const [clients, setClients] = useState([]);
     const [nouveauClient, setNouveauClient] = useState(false);
     const [formNouveauClient, setFormNouveauClient] = useState({
@@ -23,6 +23,8 @@ export default function Booking() {
     const [chargementCreneaux, setChargementCreneaux] = useState(false);
     const [erreur, setErreur] = useState('');
     const [messageFerme, setMessageFerme] = useState('');
+    const [accesRefuse, setAccesRefuse] = useState(false);
+
 
     const [selection, setSelection] = useState({
         service: null,
@@ -34,6 +36,13 @@ export default function Booking() {
     });
 
     useEffect(() => {
+        // Vérifie AVANT tout chargement si l'entreprise connectée visite la page d'une autre
+        if (token && entrepriseConnectee && entrepriseConnectee.id !== parseInt(entrepriseId)) {
+            setAccesRefuse(true);
+            setChargement(false);
+            return; // stoppe ici, ne charge rien d'autre
+        }
+
         async function charger() {
             try {
                 const [entrepriseRes, servicesRes] = await Promise.all([
@@ -89,6 +98,23 @@ export default function Booking() {
         }
     }
 
+    async function confirmerRdv(e) {
+        e.preventDefault();
+        setErreur('');
+        try {
+            await axios.post(`/public/${entrepriseId}/reserver`, {
+                nom: selection.nom,
+                telephone: selection.telephone,
+                email: selection.email,
+                service_id: selection.service.id,
+                date_heure: selection.creneau
+            });
+            setEtape(3);
+        } catch (err) {
+            setErreur(err.response?.data?.error || 'Erreur lors de la réservation');
+        }
+    }
+
     async function creerClientEtConfirmer() {
         const { nom, telephone, email, informations, adresse } = formNouveauClient;
         if (!nom || !telephone || !email) {
@@ -107,7 +133,7 @@ export default function Booking() {
 
             // 3. Confirme le RDV avec le nouveau client
             await axios.post(`/public/${entrepriseId}/reserver`, {
-                nom, telephone, email,
+                nom, telephone, email, adresse, informations,
                 service_id: selection.service.id,
                 date_heure: selection.creneau
             });
@@ -137,23 +163,6 @@ export default function Booking() {
         setSelection({ ...selection, [e.target.name]: e.target.value });
     }
 
-    async function confirmerRdv(e) {
-        e.preventDefault();
-        setErreur('');
-        try {
-            await axios.post(`/public/${entrepriseId}/reserver`, {
-                nom: selection.nom,
-                telephone: selection.telephone,
-                email: selection.email,
-                service_id: selection.service.id,
-                date_heure: selection.creneau
-            });
-            setEtape(3);
-        } catch (err) {
-            setErreur(err.response?.data?.error || 'Erreur lors de la réservation');
-        }
-    }
-
     function formaterCreneau(creneauStr) {
         const date = new Date(creneauStr);
         return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -167,9 +176,17 @@ export default function Booking() {
         });
     }
 
+    // Affiche un message si accès refusé, avant tout le reste
+    if (accesRefuse) {
+        return (
+            <div style={styles.chargement}>
+                <p>🚫 Action non autorisée. <Link to="/" style={{ color: '#6366f1' }}>Retour au dashboard</Link></p>
+            </div>
+        );
+    }
+
     // Date minimum = aujourd'hui
     const dateMin = new Date().toISOString().slice(0, 10);
-
     if (chargement) return <div style={styles.chargement}>Chargement...</div>;
     if (erreur && !entreprise) return <div style={styles.chargement}>{erreur}</div>;
 
@@ -360,7 +377,7 @@ export default function Booking() {
                                                 setNouveauClient(true);
                                                 setClientSelectionne(null);
                                                 // Pré-remplit le nom si une recherche est en cours
-                                                setFormNouveauClient({ nom: recherche, telephone: '', email: '' });
+                                                setFormNouveauClient({ nom: recherche, telephone: '', email: '', adresse: '', informations: '' });
                                             }}
                                             style={styles.boutonNouveauClient}
                                         >
@@ -431,7 +448,7 @@ export default function Booking() {
                                             <input
                                                 type="text"
                                                 value={formNouveauClient.adresse}
-                                                onChange={handleChange}
+                                                onChange={e => setFormNouveauClient({ ...formNouveauClient, adresse: e.target.value })}
                                                 style={styles.input}
                                                 placeholder="12 rue de la Paix, 75001 Paris"
                                             />
@@ -442,7 +459,7 @@ export default function Booking() {
                                             <textarea
                                                 name="informations"
                                                 value={formNouveauClient.informations}
-                                                onChange={handleChange}
+                                                onChange={e => setFormNouveauClient({ ...formNouveauClient, informations: e.target.value })}
                                                 style={{ ...styles.input, height: '80px', resize: 'vertical' }}
                                                 placeholder="Allergies, préférences, notes particulières..."
                                             />
