@@ -1,0 +1,45 @@
+@media (max-width: 600px) {
+    .progression {
+        gap: 0;
+    }
+
+    .etape-container {
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        position: relative;
+    }
+
+    .etape-label {
+        display: none;
+    }
+
+    .etape-ligne {
+        display: none;
+    }
+
+    .etape-bulle {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .recap-service {
+        flex-direction: column;
+    }
+
+    .client-ligne {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .grille-services {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    }
+
+    .service-footer {
+        flex-direction: column;
+    }
+}

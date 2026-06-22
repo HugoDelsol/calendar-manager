@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import axios from '../api/axios';
+import './RendezVous.css';
+import './Global.css';
 
 const STATUTS = {
     confirme: { label: 'Confirmé', couleur: '#6366f1', bg: '#eef2ff' },
@@ -13,7 +15,7 @@ export default function RendezVous() {
     const { entreprise } = useAuth();
     const [rdvs, setRdvs] = useState([]);
     const [clients, setClients] = useState([]);
-    const [services, setServices] = useState([]);    
+    const [services, setServices] = useState([]);
     const [chargement, setChargement] = useState(true);
     const [afficherTout, setAfficherTout] = useState(false);
     const [afficherFormulaire, setAfficherFormulaire] = useState(false);
@@ -37,7 +39,7 @@ export default function RendezVous() {
             setRdvs(rdvRes.data);
             setClients(clientRes.data);
             setServices(serviceRes.data);
-            setServices(serviceRes.data);      
+            setServices(serviceRes.data);
         } catch (err) {
             console.error(err);
         } finally {
@@ -90,6 +92,27 @@ export default function RendezVous() {
         }
     }
 
+    function ouvrirFormulaire(rdv) {
+        setRdvEnEdition(rdv);
+        const date = new Date(rdv.date_heure);
+        const dateLocale = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+            .toISOString().slice(0, 16);
+        setForm({
+            client_id: rdv.client_id,
+            service_id: rdv.service_id,
+            date_heure: dateLocale,
+            statut: rdv.statut
+        });
+        setAfficherFormulaire(true);
+        setErreur('');
+    }
+
+    function fermerFormulaire() {
+        setAfficherFormulaire(false);
+        setRdvEnEdition(null);
+        setErreur('');
+    }
+
     async function supprimerRdv(id) {
         if (!window.confirm('Supprimer ce rendez-vous ?')) return;
         try {
@@ -127,10 +150,10 @@ export default function RendezVous() {
     if (chargement) return <div style={styles.chargement}>Chargement...</div>;
 
     return (
-        <div style={styles.container}>
-            <div style={styles.header}>
+        <div style={styles.container} className='container'>
+            <div style={styles.header} className='header'>
 
-                <h1 style={styles.titre}>📅 Rendez-vous</h1>
+                <h1 style={styles.titre} className='titre'>📅 Rendez-vous</h1>
                 <Link
                     to={`/booking/${entreprise?.id}`}
                 >
@@ -139,7 +162,7 @@ export default function RendezVous() {
             </div>
 
             {/* Toggle semaine / tout */}
-            <div style={styles.toggle}>
+            <div style={styles.toggle} className='toggle'>
                 <button
                     onClick={() => setAfficherTout(false)}
                     style={{ ...styles.toggleBtn, ...(afficherTout ? {} : styles.toggleActif) }}
@@ -259,8 +282,8 @@ export default function RendezVous() {
                     {rdvsAffiches
                         .sort((a, b) => new Date(a.date_heure) - new Date(b.date_heure))
                         .map(rdv => (
-                            <div key={rdv.id} style={styles.rdvCard}>
-                                <div style={styles.rdvDate}>
+                            <div key={rdv.id} style={styles.rdvCard} className='rdv-card'>
+                                <div style={styles.rdvDate} className='rdv-date'>
                                     <span style={styles.rdvJour}>{formaterDate(rdv.date_heure)}</span>
                                     <span style={styles.rdvHeure}>{formaterHeure(rdv.date_heure)}</span>
                                 </div>

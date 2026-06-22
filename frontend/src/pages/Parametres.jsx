@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
+import './Global.css';
 
 export default function Parametres() {
     const { entreprise, login } = useAuth();
@@ -80,7 +81,7 @@ export default function Parametres() {
     }
 
     return (
-        <div style={styles.container}>
+        <div style={styles.container} className='container'>
             <h1 style={styles.titre}>⚙️ Paramètres</h1>
 
             {erreur && <p style={styles.erreur}>{erreur}</p>}

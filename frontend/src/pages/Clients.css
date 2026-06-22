@@ -1,0 +1,23 @@
+@media (max-width: 768px) {
+
+    .container {
+        width: 90vw;
+    }
+
+    .ligne-client {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .liste-header {
+        grid-template-columns: 1fr !important;
+    }
+
+    .liste-header span {
+        display: none;
+    }
+
+    .liste-header .visible {
+        display: block;
+    }
+}

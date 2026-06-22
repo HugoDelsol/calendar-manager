@@ -18,4 +18,12 @@ const limiterAuth = rateLimit({
     legacyHeaders: false
 });
 
-module.exports = { limiterGlobal, limiterAuth };
+const limiterReservation = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 heure
+    max: 5,                    // 5 réservations max par IP par heure
+    message: { error: 'Trop de réservations, réessayez dans une heure' },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+module.exports = { limiterGlobal, limiterAuth, limiterReservation };

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from '../api/axios';
+import './Global.css';
+import './Services.css';
 
 export default function Services() {
     const [services, setServices] = useState([]);
@@ -82,9 +84,9 @@ export default function Services() {
     if (chargement) return <div style={styles.chargement}>Chargement...</div>;
 
     return (
-        <div style={styles.container}>
-            <div style={styles.header}>
-                <h1 style={styles.titre}>✂️ Services</h1>
+        <div style={styles.container} className='container'>
+            <div style={styles.header} className='header'>
+                <h1 style={styles.titre} className='titre'>✂️ Services</h1>
                 <button onClick={() => ouvrirFormulaire()} style={styles.boutonAjouter}>
                     + Nouveau service
                 </button>
@@ -114,7 +116,7 @@ export default function Services() {
                                 />
                             </div>
 
-                            <div style={styles.rangee}>
+                            <div style={styles.rangee} className='rangee'>
                                 <div style={styles.champ}>
                                     <label style={styles.label}>Durée (minutes)</label>
                                     <input

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useParams, Link } from 'react-router-dom';
 import axios from '../api/axios';
+import './Booking.css';
+import './Global.css';
 
 const ETAPES = ['Service', 'Date & Créneau', 'Vos infos', 'Confirmation'];
 
@@ -226,31 +228,31 @@ export default function Booking() {
                 </div>
             )}
 
-            <div style={styles.container}>
+            <div style={styles.container} className='container'>
                 {/* Barre de progression */}
                 {!token && (
-                    <div style={styles.progression}>
+                    <div style={styles.progression} className="progression">
                         {ETAPES.map((e, i) => (
-                            <div key={i} style={styles.etapeContainer}>
+                            <div key={i} style={styles.etapeContainer} className="etape-container">
                                 <div style={{
                                     ...styles.etapeBulle,
                                     backgroundColor: i <= etape ? '#6366f1' : '#ddd',
                                     color: i <= etape ? 'white' : '#888'
-                                }}>
+                                }} className="etape-bulle">
                                     {i < etape ? '✓' : i + 1}
                                 </div>
                                 <span style={{
                                     ...styles.etapeLabel,
                                     color: i <= etape ? '#6366f1' : '#888',
                                     fontWeight: i === etape ? '700' : '400'
-                                }}>
+                                }} className="etape-label">
                                     {e}
                                 </span>
                                 {i < ETAPES.length - 1 && (
                                     <div style={{
                                         ...styles.etapeLigne,
                                         backgroundColor: i < etape ? '#6366f1' : '#ddd'
-                                    }} />
+                                    }} className="etape-ligne" />
                                 )}
                             </div>
                         ))}
@@ -266,7 +268,7 @@ export default function Booking() {
                         {services.length === 0 ? (
                             <p style={styles.vide}>Aucun service disponible</p>
                         ) : (
-                            <div style={styles.grilleServices}>
+                            <div style={styles.grilleServices} className='grille-services'>
                                 {services.map(service => (
                                     <div
                                         key={service.id}
@@ -277,7 +279,7 @@ export default function Booking() {
                                         {service.description && (
                                             <p style={styles.serviceDesc}>{service.description}</p>
                                         )}
-                                        <div style={styles.serviceFooter}>
+                                        <div style={styles.serviceFooter} className='service-footer'>
                                             <span style={styles.serviceDuree}>⏱ {service.duree_minutes} min</span>
                                             <span style={styles.servicePrix}>{service.prix} €</span>
                                         </div>
@@ -294,7 +296,7 @@ export default function Booking() {
                         <button onClick={() => setEtape(0)} style={styles.boutonRetour}>← Retour</button>
                         <h2 style={styles.sectionTitre}>Choisissez une date</h2>
 
-                        <div style={styles.recapService}>
+                        <div style={styles.recapService} className='recap-service'>
                             <strong>{selection.service?.nom}</strong>
                             <span>{selection.service?.duree_minutes} min — {selection.service?.prix} €</span>
                         </div>
@@ -409,6 +411,7 @@ export default function Booking() {
                                                 )
                                                 .map(client => (
                                                     <div
+                                                        className='client-ligne'
                                                         key={client.id}
                                                         onClick={() => setClientSelectionne(client)}
                                                         style={{
@@ -462,8 +465,6 @@ export default function Booking() {
                                                 ← Retour à la recherche
                                             </button>
                                         </div>
-
-                                        {erreur && <p style={styles.erreur}>{erreur}</p>}
 
                                         <div style={styles.champ}>
                                             <label style={styles.label}>Nom complet</label>
@@ -599,9 +600,9 @@ export default function Booking() {
                             )}
                         </p>
                         <div style={styles.recapRdv}>
-                            <p><strong>Service :</strong> {selection.service?.nom}</p>
-                            <p><strong>Date :</strong> {formaterDateComplete(selection.creneau)}</p>
-                            <p><strong>Établissement :</strong> {entreprise?.nom}</p>
+                            <p><strong>Service :</strong></p> <p>{selection.service?.nom}</p>
+                            <p><strong>Date :</strong> </p> <p>{formaterDateComplete(selection.creneau)}</p>
+                            <p><strong>Établissement :</strong></p> <p> {entreprise?.nom}</p>
                         </div>
                     </div>
                 )}
@@ -974,3 +975,4 @@ const styles = {
         fontWeight: '500'
     }
 };
+

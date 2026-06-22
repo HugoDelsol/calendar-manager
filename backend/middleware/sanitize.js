@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 
 // Middleware générique qui vérifie les erreurs de validation
 function valider(req, res, next) {
@@ -55,7 +55,7 @@ const reglesService = [
 
 const reglesClient = [
     body('nom').trim().notEmpty().withMessage('Nom requis').isLength({ max: 100 }).stripLow(),
-    body('telephone').trim().notEmpty().withMessage('Téléphone requis').isLength({ max: 20 }),
+    body('telephone').trim().notEmpty().withMessage('Téléphone requis').isMobilePhone('any', { strictMode: false }).withMessage('Numéro de téléphone invalide'),
     body('email').trim().isEmail().withMessage('Email invalide').normalizeEmail({ gmail_remove_dots: false }),
     body('informations').optional().trim().isLength({ max: 1000 }).stripLow(),
     body('adresse').optional().trim().isLength({ max: 255 }).stripLow()
@@ -103,10 +103,14 @@ const reglesEntreprise = [
 
 const reglesReservation = [
     body('nom').trim().notEmpty().withMessage('Nom requis').isLength({ max: 100 }).stripLow(),
-    body('telephone').trim().notEmpty().withMessage('Téléphone requis').isLength({ max: 20 }),
+    body('telephone').trim().notEmpty().withMessage('Téléphone requis').isMobilePhone('any', { strictMode: false }).withMessage('Numéro de téléphone invalide'),
     body('email').trim().isEmail().withMessage('Email invalide').normalizeEmail({ gmail_remove_dots: false }),
     body('service_id').isInt({ min: 1 }).withMessage('Service invalide'),
     body('date_heure').notEmpty().withMessage('Date requise').isISO8601().withMessage('Format de date invalide')
+];
+
+const reglesParamEntrepriseId = [
+    param('entrepriseId').isInt({ min: 1 }).withMessage('Identifiant entreprise invalide')
 ];
 
 module.exports = {
@@ -122,4 +126,5 @@ module.exports = {
     reglesTemplate,
     regleMotDePasse,
     reglesReservation,
+    reglesParamEntrepriseId,
 };

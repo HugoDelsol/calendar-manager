@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from '../api/axios';
+import './Clients.css';
+import './Global.css';
 
 export default function Clients() {
     const [clients, setClients] = useState([]);
@@ -88,9 +90,9 @@ export default function Clients() {
     if (chargement) return <div style={styles.chargement}>Chargement...</div>;
 
     return (
-        <div style={styles.container}>
-            <div style={styles.header}>
-                <h1 style={styles.titre}>👥 Clients</h1>
+        <div style={styles.container} className='container'>
+            <div style={styles.header}  className='header'>
+                <h1 style={styles.titre} className='titre'>👥 Clients</h1>
                 <button onClick={() => ouvrirFormulaire()} style={styles.boutonAjouter}>
                     + Nouveau client
                 </button>
@@ -202,15 +204,15 @@ export default function Clients() {
                 </div>
             ) : (
                 <div style={styles.liste}>
-                    <div style={styles.listeHeader}>
+                    <div style={styles.listeHeader} className='liste-header'>
                         <span>Nom</span>
                         <span>Téléphone</span>
                         <span>Email</span>
-                        <span>Informations</span>
+                        <span className='visible'>Informations</span>
                         <span>Actions</span>
                     </div>
                     {clientsFiltres.map(client => (
-                        <div key={client.id} style={styles.ligneClient}>
+                        <div key={client.id} style={styles.ligneClient} className='ligne-client'>
                             <div>
                                 <span style={styles.clientNom}>{client.nom}</span>
                                 {client.adresse && <span style={styles.clientAdresse}>{client.adresse}</span>}

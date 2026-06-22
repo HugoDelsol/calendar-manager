@@ -1,0 +1,19 @@
+@media (max-width: 768px) {
+
+    .container {
+        width: 90vw;
+    }
+
+    .stats-grid,
+    .raccourcis {
+        grid-template-columns: 1fr !important;
+    }
+
+    .section-header {
+        flex-direction: column;
+    }
+
+    .bouton-ajouter {
+        padding: 5px 10px !important;
+    }
+}

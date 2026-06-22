@@ -1,0 +1,19 @@
+@media (max-width: 1200px) {
+    .nav-liens {
+        display: none !important;
+    }
+
+    .nav-logout {
+        display: none !important;
+    }
+
+    .nav-hamburger {
+        display: block !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .nav-menu-mobile {
+        display: none !important;
+    }
+}

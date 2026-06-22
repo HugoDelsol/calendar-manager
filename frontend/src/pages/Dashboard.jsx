@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
+import './Dashboard.css';
+import './Global.css';
 
 export default function Dashboard() {
     const { entreprise } = useAuth();
@@ -53,14 +55,14 @@ export default function Dashboard() {
     if (chargement) return <div style={styles.chargement}>Chargement...</div>;
 
     return (
-        <div style={styles.container}>
+        <div style={styles.container} className='container'>
             <h1 style={styles.titre}>Bonjour, {entreprise?.nom} 👋</h1>
             <p style={styles.date}>{new Date().toLocaleDateString('fr-FR', {
                 weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
             })}</p>
 
             {/* Stats */}
-            <div style={styles.statsGrid}>
+            <div style={styles.statsGrid} className='stats-grid'>
                 <div style={styles.statCard}>
                     <span style={styles.statNombre}>{stats.aujourdhui}</span>
                     <span style={styles.statLabel}>RDV aujourd'hui</span>
@@ -76,8 +78,8 @@ export default function Dashboard() {
             </div>
 
             {/* RDV du jour */}
-            <div style={styles.section}>
-                <div style={styles.sectionHeader}>
+            <div style={styles.section} >
+                <div style={styles.sectionHeader} className='section-header'>
                     <h2 style={styles.sectionTitre}>📅 Rendez-vous du jour</h2>
                     <Link to="/rendez-vous" style={styles.voirTout}>Voir tout →</Link>
                 </div>
@@ -85,7 +87,7 @@ export default function Dashboard() {
                 {rdvs.length === 0 ? (
                     <div style={styles.vide}>
                         <p>Aucun rendez-vous aujourd'hui</p>
-                        <Link to={`/booking/${entreprise?.id}`} style={styles.boutonAjouter}>
+                        <Link to={`/booking/${entreprise?.id}`} style={styles.boutonAjouter} className='bouton-ajouter'>
                             + Ajouter un rendez-vous
                         </Link>
                     </div>
@@ -115,7 +117,7 @@ export default function Dashboard() {
             {/* Raccourcis */}
             <div style={styles.section}>
                 <h2 style={styles.sectionTitre}>Accès rapide</h2>
-                <div style={styles.raccourcis}>
+                <div style={styles.raccourcis} className='raccourcis'>
                     <Link to={`/booking/${entreprise?.id}`} style={styles.raccourci}>
                         <span style={styles.raccourciIcon}>📅</span>
                         <span>Nouveau RDV</span>

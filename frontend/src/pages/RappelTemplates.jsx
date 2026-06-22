@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from '../api/axios';
+import './Global.css';
+import './RappelTemplates.css'
 
 export default function RappelTemplates() {
     const [templates, setTemplates] = useState([]);
@@ -109,15 +111,15 @@ export default function RappelTemplates() {
     if (chargement) return <div style={styles.chargement}>Chargement...</div>;
 
     return (
-        <div style={styles.container}>
-            <div style={styles.header}>
+        <div style={styles.container} className='container'>
+            <div style={styles.header} className='header'>
                 <div>
                     <h1 style={styles.titre}>🔔 Templates de rappel</h1>
                     <p style={styles.sousTitre}>
                         Configurez des rappels automatiques envoyés après chaque rendez-vous terminé
                     </p>
                 </div>
-                <button onClick={() => ouvrirFormulaire()} style={styles.boutonAjouter}>
+                <button onClick={() => ouvrirFormulaire()} style={styles.boutonAjouter} className='bouton-ajouter'>
                     + Nouveau template
                 </button>
             </div>
@@ -125,7 +127,7 @@ export default function RappelTemplates() {
             {/* Formulaire */}
             {afficherFormulaire && (
                 <div style={styles.overlay}>
-                    <div style={styles.modal}>
+                    <div style={styles.modal} className='modal'>
                         <h2 style={styles.modalTitre}>
                             {templateEnEdition ? 'Modifier le template' : 'Nouveau template'}
                         </h2>
@@ -157,7 +159,7 @@ export default function RappelTemplates() {
                                 />
                             </div>
 
-                            <div style={styles.rangee}>
+                            <div style={styles.rangee} className='rangee'>
                                 <div style={styles.champ}>
                                     <label style={styles.label}>Délai après RDV (jours)</label>
                                     <input
@@ -236,12 +238,12 @@ export default function RappelTemplates() {
             ) : (
                 <div style={styles.liste}>
                     {templates.map(template => (
-                        <div key={template.id} style={{
+                        <div key={template.id} className='template-card' style={{
                             ...styles.templateCard,
                             opacity: template.actif ? 1 : 0.6
                         }}>
-                            <div style={styles.templateLeft}>
-                                <div style={styles.templateHeader}>
+                            <div style={styles.templateLeft} >
+                                <div style={styles.templateHeader} className='template-header'>
                                     <h3 style={styles.templateTitre}>{template.titre}</h3>
                                     <span style={{
                                         ...styles.badge,
@@ -254,7 +256,7 @@ export default function RappelTemplates() {
                                 {template.message && (
                                     <p style={styles.templateMessage}>{template.message}</p>
                                 )}
-                                <div style={styles.templateMeta}>
+                                <div style={styles.templateMeta} className='template-meta'>
                                     <span style={styles.metaItem}>
                                         ⏱ Envoyé {formaterDelai(template.delai_jours)} après le RDV
                                     </span>

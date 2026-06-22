@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from '../api/axios';
+import './Global.css';
 
 const JOURS = [
     { id: 1, label: 'Lundi' },
@@ -109,7 +110,7 @@ export default function Horaires() {
     if (chargement) return <div style={styles.chargement}>Chargement...</div>;
 
     return (
-        <div style={styles.container}>
+        <div style={styles.container} className='container'>
             <h1 style={styles.titre}>🕐 Horaires & Disponibilités</h1>
 
             {/* Section horaires */}

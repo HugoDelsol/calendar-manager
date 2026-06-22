@@ -1,0 +1,35 @@
+@media (max-width: 768px) {
+
+    h1 {
+        text-align: center !important;
+    }
+
+    .bouton-ajouter {
+        margin-top: 20px;
+    }
+
+    .template-card {
+        flex-direction: column;
+        align-items: start !important;
+
+    }
+
+    .template-meta {
+        text-align: left;
+        gap: 0 !important;
+        flex-direction: column-reverse;
+    }
+
+    .template-header {
+        align-items: start !important;
+        flex-direction: column-reverse !important;
+    }
+
+    .rangee {
+        grid-template-columns: 1fr;
+    }
+
+    .modal {
+        border-radius: 0 !important;
+    }
+}
