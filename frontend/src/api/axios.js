@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
 });
 
 // Nettoie les strings (retire les balises HTML)
@@ -38,9 +38,17 @@ instance.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('entreprise');
-            window.location.href = '/login';
+            const url = error.response?.config?.url || '';
+            
+            // Ne pas rediriger pour les routes d'authentification
+            const routesAuth = ['/auth/login', '/auth/inscription', '/auth/reinitialiser-mot-de-passe'];
+            const estRouteAuth = routesAuth.some(route => url.includes(route));
+            
+            if (!estRouteAuth) {
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('entreprise');
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }
